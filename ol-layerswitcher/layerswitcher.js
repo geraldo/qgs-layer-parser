@@ -48,9 +48,9 @@
                 target: 'map',
                 layers: qgisLayers,
                 view: new ol.View({
-                    center: [220636,5082816],
-                    zoom: 13,
-                    minZoom: 12,
+                    center: ol.proj.transform([2.154007, 41.390205], "EPSG:4326", "EPSG:3857"),
+                    zoom: 12,
+                    minZoom: 10,
                     maxZoom: 20
                 })
             });
