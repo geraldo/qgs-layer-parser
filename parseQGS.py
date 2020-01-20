@@ -37,7 +37,7 @@ def run():
 	print("Project file:", project.fileName())
 
 	def replaceSpecialChar(text):
-	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~"
+	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~¬"
 	    for c in chars:
 	        text = text.replace(c, "")
 	    return text
@@ -64,6 +64,10 @@ def run():
 			obj['fields'] = []
 			obj['actions'] = []
 			obj['external'] = node.name().startswith("¬")
+
+			# remove first character
+			if not obj['showlegend']:
+				obj['name'] = node.name()[1:]
 
 			# fetch layer directly from external server (not from QGIS nor mapproxy)
 			if obj['external']:
@@ -130,9 +134,14 @@ def run():
 			obj['hidden'] = node.name().startswith("@")
 			if obj['hidden']:
 				obj['visible'] = True 	# hidden layers/groups have to be visible by default
+			obj['showlegend'] = not node.name().startswith("~")	# don't show legend in layertree
 			obj['children'] = []
 			#print("- group: ", node.name())
 			#print(node.children())
+
+			# remove first character
+			if not obj['showlegend']:
+				obj['name'] = node.name()[1:]
 
 			for child in node.children():
 				obj['children'].append(layertree(child))
