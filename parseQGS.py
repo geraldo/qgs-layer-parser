@@ -53,6 +53,7 @@ def run():
 
 		if isinstance(node, QgsLayerTreeLayer):
 			obj['name'] = node.name()
+			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
 			obj['mapproxy'] = "ctbb_"+project_file+"_layer_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "layer"
 			obj['indentifiable'] = node.layerId() not in nonidentify
@@ -128,6 +129,7 @@ def run():
 
 		elif isinstance(node, QgsLayerTreeGroup):
 			obj['name'] = node.name()
+			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
 			obj['mapproxy'] = "ctbb_"+project_file+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "group"
 			obj['visible'] = node.isVisible()
