@@ -14,6 +14,11 @@ def run():
 	prj_file = sys.argv[1]
 	project_file = prj_file.replace('.qgs', '')
 
+	# mapproxy proyect name
+	mapproxy_name = project_file
+	if sys.argv[2]:
+		mapproxy_name = sys.argv[2]
+
 	# create a reference to the QgsApplication, setting the
 	# second argument to False disables the GUI
 	qgs = QgsApplication([], False)
@@ -54,7 +59,7 @@ def run():
 		if isinstance(node, QgsLayerTreeLayer):
 			obj['name'] = node.name()
 			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
-			obj['mapproxy'] = "ctbb_"+project_file+"_layer_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
+			obj['mapproxy'] = "ctbb_"+mapproxy_name+"_layer_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "layer"
 			obj['indentifiable'] = node.layerId() not in nonidentify
 			obj['visible'] = node.isVisible()
@@ -130,7 +135,7 @@ def run():
 		elif isinstance(node, QgsLayerTreeGroup):
 			obj['name'] = node.name()
 			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
-			obj['mapproxy'] = "ctbb_"+project_file+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
+			obj['mapproxy'] = "ctbb_"+mapproxy_name+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "group"
 			obj['visible'] = node.isVisible()
 			obj['hidden'] = node.name().startswith("@")

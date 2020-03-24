@@ -4,7 +4,7 @@ Parse QGIS 3 project files and write a JSON config file with layer information.
 
 ## Getting started
 
-Start the script using `python3 parseQGS.py project.qgs`
+Start the script using `python3 parseQGS.py project.qgs [mapproxy_project_name]`
 
 It creates a JSON configuration file called `project.qgs.json`.
 
@@ -41,6 +41,7 @@ A typical output for a layer could look like this:
 
 - `project_path` defines the path to the local project directory where .qgs file is located.
 - `dest_path` defines the path to the output directory.
+- `mapproxy_project_name` defines an optional mapproxy project name. If specified it will use this mapproxy name instead of the default project name. Thought for projects using mostly another mapproxy base.
 
 ## Special characters
 
