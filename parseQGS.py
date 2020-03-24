@@ -42,7 +42,7 @@ def run():
 	print("Project file:", project.fileName())
 
 	def replaceSpecialChar(text):
-	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~¬"
+	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~¬·"
 	    for c in chars:
 	        text = text.replace(c, "")
 	    return text
