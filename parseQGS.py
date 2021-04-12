@@ -6,17 +6,15 @@ import unicodedata
 import sys
 
 def run():
-	project_path = '/var/servers/ctbb/maps/'
-	dest_path = '/var/servers/ctbb/web/js/data/'
-	# project_path = '/home/gerald/Documents/PSIG/ctbb/maps/'
-	# dest_path = '/var/www/html/CTBB/js/data/'
+	project_path = '/home/gerald/mapa/'
+	dest_path = '/home/gerald/mapa/'
 
 	prj_file = sys.argv[1]
 	project_file = prj_file.replace('.qgs', '')
 
 	# mapproxy proyect name
 	mapproxy_name = project_file
-	if sys.argv[2]:
+	if len(sys.argv)>2:
 		mapproxy_name = sys.argv[2]
 
 	# create a reference to the QgsApplication, setting the

@@ -37,6 +37,19 @@ A typical output for a layer could look like this:
   },
 ```
 
+## Error debugging
+
+If you run the script on a server without X Server, you could get an error like:
+
+`qt.qpa.xcb: could not connect to display 
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.`
+
+`qgis-layer-parser` uses `QgsApplication`, which needs `QGuiApplication`, but principally is a console applications to be run in a non-X environment, so try turning off X Server by:
+
+`export QT_QPA_PLATFORM=offscreen`
+
+If you still run into troubles, try to set `QT_DEBUG_PLUGINS=1`.
+
 ## Configuration
 
 - `project_path` defines the path to the local project directory where .qgs file is located.
