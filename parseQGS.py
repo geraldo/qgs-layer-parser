@@ -6,15 +6,18 @@ import unicodedata
 import sys
 
 def run():
-	project_path = '/home/gerald/mapa/'
-	dest_path = '/home/gerald/mapa/'
+	project_name = 'ctbb'
+	project_path = '/home/ubuntu/'+project_name+'/'
+	dest_path = '/var/www/mapa/'+project_name+'/js/data/'
+	#project_path = '/home/gerald/Documents/PSIG/ctbb/wfs/'
+	#dest_path = project_path
 
 	prj_file = sys.argv[1]
 	project_file = prj_file.replace('.qgs', '')
 
 	# mapproxy proyect name
 	mapproxy_name = project_file
-	if len(sys.argv)>2:
+	if len(sys.argv) > 2:
 		mapproxy_name = sys.argv[2]
 
 	# create a reference to the QgsApplication, setting the
@@ -39,6 +42,9 @@ def run():
 	print("Project title:", project.title())
 	print("Project file:", project.fileName())
 
+	wfsList = project.readListEntry("WFSLayers", "/")[0]
+	#print("Vector layers:", wfsList);
+
 	def replaceSpecialChar(text):
 	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~¬·"
 	    for c in chars:
@@ -49,7 +55,7 @@ def run():
 	   return ''.join(c for c in unicodedata.normalize('NFD', s)
 	                  if unicodedata.category(c) != 'Mn')
 
-	def layertree(node):
+	def layertree(node, vectorial=False):
 		#print(node.dump())
 		#print(node.name(), type(node))
 		obj = {}
@@ -57,7 +63,7 @@ def run():
 		if isinstance(node, QgsLayerTreeLayer):
 			obj['name'] = node.name()
 			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
-			obj['mapproxy'] = "ctbb_"+mapproxy_name+"_layer_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
+			obj['mapproxy'] = project_name+"_"+mapproxy_name+"_layer_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "layer"
 			obj['indentifiable'] = node.layerId() not in nonidentify
 			obj['visible'] = node.isVisible()
@@ -65,6 +71,12 @@ def run():
 			if obj['hidden']:
 				obj['visible'] = True 	# hidden layers/groups have to be visible by default
 			obj['showlegend'] = not node.name().startswith("~") and not node.name().startswith("¬")	# don't show legend in layertree
+
+			vectorial = False
+			if node.layerId() in wfsList:
+				vectorial = True
+
+			obj['vectorial'] = vectorial
 			obj['fields'] = []
 			obj['actions'] = []
 			obj['external'] = node.name().startswith("¬")
@@ -106,6 +118,10 @@ def run():
 
 			layer = project.mapLayer(node.layerId())
 
+			if vectorial:
+				print("write sld to:", dest_path+"sld/"+prj_file+'_'+node.name()+".sld")
+				layer.saveSldStyle(dest_path+"sld/"+prj_file+"_"+node.name()+".sld")
+
 			if obj['indentifiable'] and isinstance(layer, QgsVectorLayer):
 
 				fields = []
@@ -133,14 +149,13 @@ def run():
 		elif isinstance(node, QgsLayerTreeGroup):
 			obj['name'] = node.name()
 			obj['qgisname'] = node.name()	# internal qgis layer name with all special characters
-			obj['mapproxy'] = "ctbb_"+mapproxy_name+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
+			obj['mapproxy'] = project_name+"_"+mapproxy_name+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "group"
 			obj['visible'] = node.isVisible()
 			obj['hidden'] = node.name().startswith("@")
 			if obj['hidden']:
 				obj['visible'] = True 	# hidden layers/groups have to be visible by default
 			obj['showlegend'] = not node.name().startswith("~")	# don't show legend in layertree
-			obj['children'] = []
 			#print("- group: ", node.name())
 			#print(node.children())
 
@@ -148,8 +163,14 @@ def run():
 			if not obj['showlegend']:
 				obj['name'] = node.name()[1:]
 
+			vectorial = False
+			#if node.name() in groups_vectorial:
+			#	vectorial = True
+			obj['vectorial'] = vectorial
+			obj['children'] = []
+
 			for child in node.children():
-				obj['children'].append(layertree(child))
+				obj['children'].append(layertree(child, vectorial))
 
 		return obj
 
@@ -167,7 +188,6 @@ def run():
 	f=open(dest_path+prj_file+'.json', 'w+')
 	f.write(json.dumps(info))
 	f.close()
-	#QgsVectorFileWriter.writeAsVectorFormat(i,dataStore + os.sep + 'exp_' + safeLayerName + '.js', 'utf-8', exp_crs, 'GeoJSON', layerOptions=['COORDINATE_PRECISION=3'])
 
 	# When your script is complete, call exitQgis() to remove the
 	# provider and layer registries from memory
