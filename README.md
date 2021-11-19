@@ -52,11 +52,21 @@ If you still run into troubles, try to set `QT_DEBUG_PLUGINS=1`.
 
 ## Configuration
 
+- `project_name` defines a project folder which is added to `project_path`
 - `project_path` defines the path to the local project directory where .qgs file is located.
 - `dest_path` defines the path to the output directory.
 - `mapproxy_project_name` defines an optional mapproxy project name. If specified it will use this mapproxy name instead of the default project name. Thought for projects using mostly another mapproxy base.
 
+## QGIS project variables
+
+Groups and layers can be hidden by adding their names inside an array like QGIS project variable:
+
+- `groups_hideintoc='["group_name_1","group_name_2"]'`
+- `layers_hideintoc='["layer_name_1","layer_name_2"]'`
+
 ## Special characters
+
+Alternativly to QGIS project variables some special characters can be used to hide layers, etc.:
 
 - `@` to hide layers: You can use character `@` in front of layer/group names in QGIS to set `"hidden": true`. This tells layerswitcher to avoid showing layer/group but renders layer/groups by default.
 - `~` to hide legend: You can use character `~` in front of layer/group names in QGIS to set `"showLegend": false`. This can be used to avoid rendering the legend.

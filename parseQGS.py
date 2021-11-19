@@ -6,11 +6,9 @@ import unicodedata
 import sys
 
 def run():
-	project_name = 'ctbb'
-	project_path = '/home/ubuntu/'+project_name+'/'
-	dest_path = '/var/www/mapa/'+project_name+'/js/data/'
-	#project_path = '/home/gerald/Documents/PSIG/ctbb/wfs/'
-	#dest_path = project_path
+	project_name = 'test'
+	project_path = '/home/gerald/'+project_name+'/'
+	dest_path = project_path
 
 	prj_file = sys.argv[1]
 	project_file = prj_file.replace('.qgs', '')
@@ -41,9 +39,19 @@ def run():
 
 	print("Project title:", project.title())
 	print("Project file:", project.fileName())
+	
+	cumstomVariables = project.customVariables()
+	if "groups_vectorial" in cumstomVariables:
+		groups_vectorial = json.loads(cumstomVariables["groups_vectorial"])
+	print("Custom variables:", cumstomVariables)
 
+	if not "layers_hideintoc" in cumstomVariables or not cumstomVariables["layers_hideintoc"]:
+		cumstomVariables["layers_hideintoc"] = []
+	if not "groups_hideintoc" in cumstomVariables or not cumstomVariables["groups_hideintoc"]:
+		cumstomVariables["groups_hideintoc"] = []
+	
 	wfsList = project.readListEntry("WFSLayers", "/")[0]
-	#print("Vector layers:", wfsList);
+	print("Vector layers:", wfsList);
 
 	def replaceSpecialChar(text):
 	    chars = "!\"#$%&'()*+,./:;<=>?@[\\]^`{|}~¬·"
@@ -67,7 +75,7 @@ def run():
 			obj['type'] = "layer"
 			obj['indentifiable'] = node.layerId() not in nonidentify
 			obj['visible'] = node.isVisible()
-			obj['hidden'] = node.name().startswith("@")	# hide layer from layertree
+			obj['hidden'] = node.name().startswith("@")	or node.name() in cumstomVariables['layers_hideintoc']
 			if obj['hidden']:
 				obj['visible'] = True 	# hidden layers/groups have to be visible by default
 			obj['showlegend'] = not node.name().startswith("~") and not node.name().startswith("¬")	# don't show legend in layertree
@@ -152,7 +160,7 @@ def run():
 			obj['mapproxy'] = project_name+"_"+mapproxy_name+"_group_"+replaceSpecialChar(stripAccents(obj['name'].lower().replace(' ', '_')))
 			obj['type'] = "group"
 			obj['visible'] = node.isVisible()
-			obj['hidden'] = node.name().startswith("@")
+			obj['hidden'] = node.name().startswith("@") or node.name() in cumstomVariables['groups_hideintoc']
 			if obj['hidden']:
 				obj['visible'] = True 	# hidden layers/groups have to be visible by default
 			obj['showlegend'] = not node.name().startswith("~")	# don't show legend in layertree
@@ -163,10 +171,7 @@ def run():
 			if not obj['showlegend']:
 				obj['name'] = node.name()[1:]
 
-			vectorial = False
-			#if node.name() in groups_vectorial:
-			#	vectorial = True
-			obj['vectorial'] = vectorial
+			obj['vectorial'] = False # groups can't be vectorial for now
 			obj['children'] = []
 
 			for child in node.children():
